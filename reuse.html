@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang="en"><head><title>Frontend Anrechnung</title><link rel="stylesheet" href="styles.css"><meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="utf-8"></head><body><nav role="navigation" class="navbar navbar-default navbar-fixed-top"><div class="container"><div class="navbar-brand">Frontend Anrechnung</div></div></nav><div class="container"><ul role="tablist" class="nav nav-tabs nav-justified"><li role="presentation"><a href="/">Basics</a></li><li role="presentation" class="active"><a href="#">Reuse</a></li><li role="presentation"><a href="/structure.html">Structure</a></li><li role="presentation"><a href="/jqueryplugin.html">jQuery Plugin</a></li><li role="presentation"><a href="/events.html">Events</a></li></ul><h1>Prototypes</h1><pre><code class="language-javascript">// JS lacks a class system
+// There is prototypal inheritance though
+// So whenever a function is called with the "new" keyword the prototype will be set up
+// Note: It's a convention to begin functions with an uppercase letter,
+// when they're supposed to be called with "new"
+
+function CoolPrototype(greeting) {
+  this.greeting = greeting || 'hello'
+}
+
+CoolPrototype.prototype.hello = function() {
+  console.log(this.greeting)
+}
+
+var foo = new CoolPrototype()
+foo.hello()
+console.log(0, foo.hasOwnProperty('greeting') === true)
+console.log(1, foo.hasOwnProperty('hello') === false)
+
+// Without the "new" keyword there is no prototype
+
+console.log(2, new CoolPrototype() instanceof CoolPrototype)
+console.log(3, CoolPrototype() === undefined)
+
+// But if we really want people to have a prototype there is a neat little "hack"
+
+function EvenCoolerPrototype() {
+  if (!(this instanceof EvenCoolerPrototype)) return new EvenCoolerPrototype()
+}
+
+console.log(4, new EvenCoolerPrototype() instanceof EvenCoolerPrototype)
+console.log(5, EvenCoolerPrototype() instanceof EvenCoolerPrototype)
+
+// There a different ways to set up the prototype
+
+var coolStuff = {
+  hello: function() {
+    console.log('moin')
+  },
+  inherited: true
+}
+
+var bar = Object.create(coolStuff)
+bar.hello()
+
+console.log(6, bar.inherited === true)
+</code></pre><h1>Mixins</h1><pre><code class="language-javascript">// Mixins aren't a part of JS natively, but as almost anything they can be used via libaries
+
+var $ = require('jquery')
+
+// For example jQuery offers an implemenation of "extend"
+console.log(7, typeof $.extend === 'function')
+
+// Extend doesn't make use of the prototype (which might be more performant)
+// and it doesn't have single inheritance
+
+var foo = {
+  a: 1
+}
+
+var bar = {
+  b: 2
+}
+
+var baz = {}
+
+$.extend(baz, bar, foo)
+
+console.log(8, baz.a === 1)
+console.log(9, baz.b === 2)
+
+// but loading jQuery only to use extend seems a little over the top
+// Let's use "extend" – a tiny npm module, that does only one thing and does it well
+
+var extend = require('extend')
+
+var boz = {}
+
+extend(boz, bar, foo)
+
+console.log(8, boz.a === 1)
+console.log(9, boz.b === 2)
+</code></pre></div><script src="common.js"></script><script src="reuse.js" async></script></body></html>

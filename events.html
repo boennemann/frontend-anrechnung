@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="en"><head><title>Frontend Anrechnung</title><link rel="stylesheet" href="styles.css"><meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="utf-8"></head><body><nav role="navigation" class="navbar navbar-default navbar-fixed-top"><div class="container"><div class="navbar-brand">Frontend Anrechnung</div></div></nav><div class="container"><ul role="tablist" class="nav nav-tabs nav-justified"><li role="presentation"><a href="/">Basics</a></li><li role="presentation"><a href="/reuse.html">Reuse</a></li><li role="presentation"><a href="/structure.html">Structure</a></li><li role="presentation"><a href="/jqueryplugin.html">jQuery Plugin</a></li><li role="presentation" class="active"><a href="#">Events</a></li></ul><h1>Events</h1><pre><code class="language-javascript">require('./lib/highlight')
+
+// we can use events to react to interaction with dom elements
+// we saw this before in the jQuery Plugin section
+
+require('./events/dom')
+
+// wouldn't it be cool to combine some things we learned?
+// fo'sure
+
+require('./events/emitter')
+
+</code></pre><h1>DOM Events</h1><div id="move" style="width: 100px; height: 100px; background: red;"></div><pre><code class="language-javascript">var $ = require('jquery')
+
+// can you see the red square above? let's select it
+var $square = $('#move')
+
+// there are some default events that get emitted when the user interacts with
+// our dom elements
+
+// How about changing the color along the rainbow as long as we move over the square?
+// Using the "on" method we can listen on certain events and pass a function
+// that is exectued whenever that events happens
+
+$square.on('mousemove touchmove', handleMove)
+
+// now we need a function that gives us those colors along the rainbow
+var hue = 0
+function rainbowColor() {
+  return 'hsl(' + (hue++%360) + ', 100%, 50%)'
+}
+
+// and the actual eventhandler that sets the color
+function handleMove() {
+  $square.css('background-color', rainbowColor())
+}
+
+// Psst I couldn't resist, I had to sneak some function hoisting in :O
+</code></pre><h1>EventEmitter</h1><pre><code class="language-javascript">// but dom events are boring
+// let's use node.js's core event module
+// (it comes with the so called EventEmitter)
+// and combine it with some other stuff we learned
+
+var EventEmitter = require('events').EventEmitter
+
+// we used extend before right?
+var extend = require('extend')
+
+// now let's create a class that tells us cool stories
+
+function ListenToMe() {
+  if (!(this instanceof ListenToMe)) return new ListenToMe
+
+  var emitter = new EventEmitter()
+  extend(this, emitter)
+}
+
+ListenToMe.prototype.tellStory = function(story) {
+  this.emit('story', story)
+}
+
+// and now some class that may listen tightly and write it all down
+
+function Listener() {
+  this.writeDownStory = function(story) {
+    console.log(story)
+  }
+  return this
+}
+
+var teller = ListenToMe()
+var listener = Listener()
+
+teller.on('story', listener.writeDownStory)
+
+teller.tellStory('Once upon a time…')
+
+// What happend?
+// The teller is extended with an EventEmitter instance so it may comunicate with others
+// Whenever it tells a story that gets broadcasted to everyone who is willing to listen
+// This is called loose coupling
+
+// Oh and btw the stories are so boring I don't want to listen any longer
+
+teller.removeListener('story', listener.writeDownStory)
+
+teller.tellStory('I\'m the greatest storyteller ever')
+</code></pre><img src="http://media3.giphy.com/media/8LBDXIEHsVUiI/giphy.gif"></div><script src="common.js"></script><script src="events.js" async></script></body></html>

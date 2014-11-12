@@ -1,0 +1,80 @@
+<!DOCTYPE html><html lang="en"><head><title>Frontend Anrechnung</title><link rel="stylesheet" href="styles.css"><meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="utf-8"></head><body><nav role="navigation" class="navbar navbar-default navbar-fixed-top"><div class="container"><div class="navbar-brand">Frontend Anrechnung</div></div></nav><div class="container"><ul role="tablist" class="nav nav-tabs nav-justified"><li role="presentation"><a href="/">Basics</a></li><li role="presentation"><a href="/reuse.html">Reuse</a></li><li role="presentation" class="active"><a href="#">Structure</a></li><li role="presentation"><a href="/jqueryplugin.html">jQuery Plugin</a></li><li role="presentation"><a href="/events.html">Events</a></li></ul><h1>Browserify</h1><pre><code class="language-javascript">var $ = require('jquery')
+
+// It is 2014, almost 2015, so the only true answer to modularity and namespacing in JS is:
+
+/*
+ _                                     _  __
+| |__  _ __ _____      _____  ___ _ __(_)/ _|_   _
+| '_ \| '__/ _ \ \ /\ / / __|/ _ \ '__| | |_| | | |
+| |_) | | | (_) \ V  V /\__ \  __/ |  | |  _| |_| |
+|_.__/|_|  \___/ \_/\_/ |___/\___|_|  |_|_|  \__, |
+                                             |___/
+*/
+
+// browserify allows to require() modules in the browser, just like in node.js
+// this opens up the world of over 100000 modules on npm
+// without even bothering about dependency hell
+// globals variables
+// files with thousands of lines
+// and almost all the other things that make frontend development nasty
+// except for IE
+
+// for example let's require syntax highlighting for this site
+require('./lib/highlight')
+// voila
+
+// or the the other chapters of this site
+var chapter1 = require('./structure/example1')
+console.log(0, chapter1 === 1337)
+
+var chapter2 = require('./structure/example2')
+chapter2.hello()
+
+var Chapter3 = require('./structure/example3')
+
+var foo = new Chapter3('na?')
+foo.greet()
+
+Chapter3.setDefault('yo!')
+var bar = new Chapter3()
+bar.greet()
+
+// And all of this without any leaked variables
+// pretty magical
+
+// but
+
+// how does this even work?
+// browserify is a preprocessor that gets one entry point
+// resolves all require calls down the dependency tree
+// and outputs one bundle
+// pretty cool
+</code></pre><h2>Example Module 1</h2><pre><code class="language-javascript">// let's just export a primitive value
+
+module.exports = 1337
+</code></pre><h2>Example Module 2</h2><pre><code class="language-javascript">// now a complete object
+
+module.exports = {
+  hello: console.log.bind(console, 'hi')
+}
+</code></pre><h2>Example Module 3</h2><pre><code class="language-javascript">// or a complete class plus some static methods on it?
+
+var greeting = 'heyha'
+
+var exports = module.exports = function CrazyClass(greeting) {
+  this.greeting = greeting || CrazyClass.getDefault()
+}
+
+exports.prototype.greet = function() {
+  console.log(this.greeting)
+}
+
+exports.getDefault = function() {
+  return greeting
+}
+
+exports.setDefault = function(input) {
+  greeting = input
+}
+
+</code></pre></div><script src="common.js"></script><script src="structure.js" async></script></body></html>
